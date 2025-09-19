@@ -1,0 +1,22 @@
+{
+  "level": "warn",
+  "message": "400.1.26|Операции с данным счетом невозможны. Обратитесь в коммерческий отдел",
+  "domain": "Pyments",
+  "action": "register",
+  "function": "cratePaymentOperation",
+  "additionalFields": [
+    {
+      "key": "operation_id",
+      "value": "44255678"
+    },
+    {
+      "key": "amount",
+      "value": "99.99"
+    },
+    {
+      "key": "payment_method",
+      "value": "card"
+    }
+  ],
+  "date": "2025-10-25 14:32:11"
+}
