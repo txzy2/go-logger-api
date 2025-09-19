@@ -1,13 +1,21 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"log"
+
+	"github.com/joho/godotenv"
+	"github.com/txzy2/go-logger-api/config"
+)
 
 func main() {
-	router := gin.Default()
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong1",
-		})
-	})
-	router.Run() // listen and serve on 0.0.0.0:8080
+	// Загружаем переменные окружения из .env файла
+	if err := godotenv.Load(); err != nil {
+		log.Printf("Warning: .env file not found: %v", err)
+	}
+
+	app := config.NewApp()
+
+	if err := app.Run("8080"); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 }

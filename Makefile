@@ -1,4 +1,4 @@
 docs-gen:
-	swag init
+	swag init -g cmd/app/main.go -o docs
 
 .PHONY: docs-gen
