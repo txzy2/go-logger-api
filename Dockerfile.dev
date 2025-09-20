@@ -1,6 +1,7 @@
 FROM golang:1.25.1-alpine
 
-RUN go install github.com/air-verse/air@latest
+RUN go install github.com/air-verse/air@latest 
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 WORKDIR /var/www
 
