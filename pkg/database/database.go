@@ -1,12 +1,14 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Config struct {
@@ -19,24 +21,24 @@ type Config struct {
 }
 
 type Database struct {
-	DB *sql.DB
+	GORM *gorm.DB
 }
 
 func NewDatabase(cfg *Config) (*Database, error) {
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName, cfg.SSLMode)
 
-	db, err := sql.Open("postgres", dsn)
+	// Создаем GORM подключение
+	gormDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %w", err)
+		return nil, fmt.Errorf("failed to open gorm database: %w", err)
+	} else {
+		log.Println("GORM connected successfully")
 	}
 
-	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("failed to ping database: %w", err)
-	}
-
-	log.Println("Database connected successfully")
-	return &Database{DB: db}, nil
+	return &Database{GORM: gormDB}, nil
 }
 
 func NewConfigFromEnv() *Config {
@@ -51,10 +53,13 @@ func NewConfigFromEnv() *Config {
 }
 
 func (d *Database) Close() error {
-	if d.DB != nil {
-		return d.DB.Close()
+	var err error
+	if d.GORM != nil {
+		if sqlDB, err := d.GORM.DB(); err == nil {
+			err = sqlDB.Close()
+		}
 	}
-	return nil
+	return err
 }
 
 func getEnv(key, defaultValue string) string {

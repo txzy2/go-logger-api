@@ -3,13 +3,13 @@ package main
 import (
 	"log"
 
-	"github.com/joho/godotenv"
 	"github.com/txzy2/go-logger-api/config"
+	"github.com/txzy2/go-logger-api/pkg"
 )
 
 func main() {
 	// Загружаем переменные окружения из .env файла
-	if err := godotenv.Load(); err != nil {
+	if err := pkg.LoadEnv(); err != nil {
 		log.Printf("Warning: .env file not found: %v", err)
 	}
 

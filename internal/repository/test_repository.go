@@ -2,7 +2,8 @@ package repository
 
 import (
 	"context"
-	"database/sql"
+
+	"gorm.io/gorm"
 )
 
 type TestRepository interface {
@@ -10,11 +11,11 @@ type TestRepository interface {
 }
 
 type testRepository struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
 // NewTestRepository создает новый экземпляр тестового репозитория
-func NewTestRepository(db *sql.DB) TestRepository {
+func NewTestRepository(db *gorm.DB) TestRepository {
 	return &testRepository{
 		db: db,
 	}
@@ -22,5 +23,9 @@ func NewTestRepository(db *sql.DB) TestRepository {
 
 // Ping проверяет соединение с БД
 func (r *testRepository) Ping(ctx context.Context) error {
-	return r.db.PingContext(ctx)
+	sqlDB, err := r.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.PingContext(ctx)
 }

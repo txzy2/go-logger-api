@@ -10,6 +10,6 @@ type Repository struct {
 
 func NewRepository(db *database.Database) *Repository {
 	return &Repository{
-		TestRepository: NewTestRepository(db.DB),
+		TestRepository: NewTestRepository(db.GORM),
 	}
 }
