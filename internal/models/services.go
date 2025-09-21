@@ -7,8 +7,8 @@ import (
 type ActiveEnum string
 
 const (
-	ActiveStatus   ActiveEnum = "active"
-	inactiveStatus ActiveEnum = "inactive"
+	ActiveStatus   ActiveEnum = "Y"
+	InactiveStatus ActiveEnum = "N"
 )
 
 type Services struct {

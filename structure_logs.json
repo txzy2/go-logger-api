@@ -4,6 +4,7 @@
   "domain": "Pyments",
   "action": "register",
   "function": "cratePaymentOperation",
+  "service": "WSPG",
   "additionalFields": [
     {
       "key": "operation_id",

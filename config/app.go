@@ -37,7 +37,7 @@ func (a *App) Run(port string) error {
 	services := service.NewService(repos)
 
 	// Инициализация handlers
-	handler := v1.NewHandler(services)
+	handler := v1.NewHandler(services, repos)
 	handler.InitRoutes(router)
 
 	srv := &http.Server{

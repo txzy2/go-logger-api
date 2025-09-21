@@ -5,11 +5,13 @@ import (
 )
 
 type Service struct {
-	TestService TestService
+	TestService     TestService
+	IncidentService IncidentService
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		TestService: NewTestService(repos.TestRepository),
+		TestService:     NewTestService(repos.TestRepository),
+		IncidentService: NewIncidentService(repos.IncidentRepository),
 	}
 }
