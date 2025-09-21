@@ -7,20 +7,20 @@ import (
 )
 
 type Handler struct {
-	services *service.Service
-	repos    *repository.Repository
+	services           *service.Service
+	repos              *repository.Repository
+	incidentMiddleware *IncidentMiddleware
 }
 
 func NewHandler(services *service.Service, repos *repository.Repository) *Handler {
 	return &Handler{
-		services: services,
-		repos:    repos,
+		services:           services,
+		repos:              repos,
+		incidentMiddleware: NewIncidentMiddleware(repos),
 	}
 }
 
 func (h *Handler) InitRoutes(router *gin.Engine) {
-	incidentMiddleware := NewIncidentMiddleware(h.repos)
-
 	api := router.Group("/api/v1")
 	{
 		api.GET("/health", h.Health)
@@ -28,7 +28,7 @@ func (h *Handler) InitRoutes(router *gin.Engine) {
 
 		log := api.Group("/log")
 		{
-			log.POST("/", incidentMiddleware.ServiceCheckMiddleware(), h.Create)
+			log.POST("/", h.incidentMiddleware.ServiceCheckMiddleware(), h.Create)
 		}
 	}
 }
