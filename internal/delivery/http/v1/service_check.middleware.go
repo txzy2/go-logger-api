@@ -30,22 +30,19 @@ func (m *IncidentMiddleware) ServiceCheckMiddleware() gin.HandlerFunc {
 		if err := c.ShouldBindJSON(&incidentData); err != nil {
 			m.Error(c, http.StatusBadRequest, err.Error())
 			c.Abort()
-		}
-
-		if incidentData.Service == "" {
-			m.Error(c, http.StatusBadRequest, "Service is empty")
-			c.Abort()
+			return
 		}
 
 		serviceName := incidentData.Service
-		_, err := m.repo.IncidentRepository.FindByName(serviceName)
-
-		if err != nil {
+		if _, err := m.repo.IncidentRepository.FindByName(serviceName); err != nil {
 			log.Printf("Error while checking service: %s", err.Error())
 			m.Error(c, http.StatusBadRequest, err.Error())
 			c.Abort()
+			return
 		}
 
+		// Сохраняем данные в контексте для использования в контроллере
+		c.Set("incidentData", incidentData)
 		c.Next()
 	}
 }

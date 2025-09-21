@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/txzy2/go-logger-api/pkg/types"
 )
 
 // Create создает новый инцидент в системе логирования
@@ -18,7 +19,14 @@ import (
 // @Failure 500 {object} map[string]interface{} "Внутренняя ошибка сервера"
 // @Router /log [post]
 func (h *Handler) Create(c *gin.Context) {
-	log.Println("Incident controller is works!")
+	data := c.MustGet("incidentData").(types.IncidentData)
 
-	h.BaseController.OK(c, "Works", nil)
+	if err := types.ValidateIncidentData(data); err != nil {
+		log.Printf("Validation error: %v", err.Error())
+		h.BaseController.Error(c, 400, "Validation error: "+err.Error())
+		return
+	}
+
+	log.Printf("Processing incident: %s from service %s", data.Message, data.Service)
+	h.BaseController.OK(c, "Incident processed successfully", nil)
 }

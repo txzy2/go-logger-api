@@ -3,6 +3,7 @@ module github.com/txzy2/go-logger-api
 go 1.25.1
 
 require (
+	github.com/go-playground/validator/v10 v10.27.0
 	github.com/gin-gonic/gin v1.10.1
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
