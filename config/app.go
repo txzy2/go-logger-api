@@ -10,6 +10,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	v1 "github.com/txzy2/go-logger-api/internal/delivery/http/v1"
 	"github.com/txzy2/go-logger-api/internal/repository"
 	"github.com/txzy2/go-logger-api/internal/service"
@@ -39,6 +42,9 @@ func (a *App) Run(port string) error {
 	// Инициализация handlers
 	handler := v1.NewHandler(services, repos)
 	handler.InitRoutes(router)
+
+	// Настройка Swagger UI
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	srv := &http.Server{
 		Addr:    ":" + port,

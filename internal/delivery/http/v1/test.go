@@ -6,27 +6,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Health проверяет состояние приложения
+// Health проверяет состояние приложения и подключение к базе данных
+// @Summary Проверка здоровья приложения
+// @Description Проверяет доступность приложения и подключение к базе данных
+// @Tags health
+// @Accept json
+// @Produce json
+// @Success 200 {object} types.TestResponse "Успешная проверка"
+// @Failure 500 {object} map[string]interface{} "Ошибка подключения к базе данных"
+// @Router /health [get]
 func (h *Handler) Health(c *gin.Context) {
-	h.services.TestService.Ping(c)
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "healthy",
-		"message": "Application is running",
-	})
-}
-
-func (h *Handler) Ping(c *gin.Context) {
 	err := h.services.TestService.Ping(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to ping",
-			"details": err.Error(),
-		})
+		h.BaseController.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "success",
-		"message": "PONG. DATABASE IS CONNECTED",
-	})
+	h.BaseController.OK(c, "DATABASE IS CONNECTED", nil)
 }

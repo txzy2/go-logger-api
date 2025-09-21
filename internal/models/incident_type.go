@@ -7,6 +7,7 @@ import (
 )
 
 // IncidentType представляет таблицу incident_type
+// @Description Модель типа инцидента
 type IncidentType struct {
 	ID             uint           `gorm:"primaryKey;autoIncrement" json:"id"`
 	TypeName       string         `gorm:"type:varchar(50);not null" json:"type_name"`
@@ -16,7 +17,7 @@ type IncidentType struct {
 	Alias          string         `gorm:"type:varchar(255);default:'manager';not null;check:alias IN ('manager','client')" json:"alias"`
 	CreatedAt      time.Time      `json:"created_at"`
 	UpdatedAt      time.Time      `json:"updated_at"`
-	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty" swaggerignore:"true"`
 
 	// Связи
 	SendTemplate SendTemplate `gorm:"foreignKey:SendTemplateID;references:ID" json:"send_template,omitempty"`

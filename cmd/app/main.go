@@ -4,9 +4,20 @@ import (
 	"log"
 
 	"github.com/txzy2/go-logger-api/config"
+	_ "github.com/txzy2/go-logger-api/docs" // Важно: импорт документации
 	"github.com/txzy2/go-logger-api/pkg"
 )
 
+// @title Logger Go API
+// @version 1.0
+// @description API для системы логирования инцидентов с поддержкой PostgreSQL
+// @host localhost:8080
+// @BasePath /api/v1
+// @contact.name API Support
+// @contact.email support@example.com
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+// @schemes http https
 func main() {
 	// Загружаем переменные окружения из .env файла
 	if err := pkg.LoadEnv(); err != nil {

@@ -4,12 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/txzy2/go-logger-api/internal/repository"
 	"github.com/txzy2/go-logger-api/internal/service"
+	"github.com/txzy2/go-logger-api/pkg/basic"
 )
 
 type Handler struct {
 	services           *service.Service
 	repos              *repository.Repository
 	incidentMiddleware *IncidentMiddleware
+	basic.BaseController[any]
 }
 
 func NewHandler(services *service.Service, repos *repository.Repository) *Handler {
@@ -20,11 +22,19 @@ func NewHandler(services *service.Service, repos *repository.Repository) *Handle
 	}
 }
 
+// @title Logger Go API
+// @version 1.0
+// @description API для системы логирования инцидентов
+// @host localhost:8080
+// @BasePath /api/v1
+// @contact.name API Support
+// @contact.email support@example.com
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
 func (h *Handler) InitRoutes(router *gin.Engine) {
 	api := router.Group("/api/v1")
 	{
 		api.GET("/health", h.Health)
-		api.GET("/ping", h.Ping)
 
 		log := api.Group("/log")
 		{

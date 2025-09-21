@@ -11,6 +11,8 @@ const (
 	InactiveStatus ActiveEnum = "N"
 )
 
+// Services представляет таблицу services
+// @Description Модель сервисов в системе
 type Services struct {
 	ID        uint       `gorm:"primaryKey;autoIncrement" json:"id"`
 	Name      string     `gorm:"type:varchar(255);not null" json:"name"`

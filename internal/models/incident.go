@@ -7,6 +7,7 @@ import (
 )
 
 // Incident представляет таблицу incident
+// @Description Модель инцидента в системе логирования
 type Incident struct {
 	ID               uint           `gorm:"primaryKey;autoIncrement" json:"id"`
 	Service          string         `gorm:"type:varchar(255);not null" json:"service"`
@@ -22,7 +23,7 @@ type Incident struct {
 	Count            int            `gorm:"not null" json:"count"`
 	CreatedAt        time.Time      `json:"created_at"`
 	UpdatedAt        time.Time      `json:"updated_at"`
-	DeletedAt        gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+	DeletedAt        gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty" swaggerignore:"true"`
 
 	// Связи
 	IncidentType IncidentType `gorm:"foreignKey:IncidentTypeID;references:ID" json:"incident_type,omitempty"`

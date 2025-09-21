@@ -21,6 +21,8 @@ func NewIncidentMiddleware(repo *repository.Repository) *IncidentMiddleware {
 	}
 }
 
+// ServiceCheckMiddleware проверяет существование сервиса перед обработкой инцидента
+// @Description Middleware для валидации сервиса в запросе создания инцидента
 func (m *IncidentMiddleware) ServiceCheckMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var incidentData types.IncidentData
