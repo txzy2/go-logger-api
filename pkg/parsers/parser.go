@@ -6,8 +6,8 @@ import (
 )
 
 type ParserInterface interface {
-	Parse(data string) (map[string]string, error)
-	ParseMessage(message string) (map[string]string, error)
+	Parse(data string) (ParserResponse, error)
+	ParseMessage(message string) (ParserMessageResponse, error)
 }
 
 type Parser struct{}

@@ -30,9 +30,9 @@ func NewIncidentService(
 }
 
 func (s *incidentService) WriteOrSaveLogs(data types.IncidentData) string {
-	parsedData, err := s.parseIncidentMessage(data)
+	parseData, err := s.parseIncidentMessage(data)
 	if err == nil {
-		res, err := s.incidentTypeRepo.FindByCode(parsedData["code"])
+		res, err := s.incidentTypeRepo.FindByCode(parseData.Code)
 		if err == nil {
 			log.Printf("Incident type: %v", res)
 			return "SUCCESS"
@@ -42,18 +42,18 @@ func (s *incidentService) WriteOrSaveLogs(data types.IncidentData) string {
 	return fmt.Sprintf("Error finding incident type: %v", err)
 }
 
-func (s *incidentService) parseIncidentMessage(data types.IncidentData) (map[string]string, error) {
+func (s *incidentService) parseIncidentMessage(data types.IncidentData) (parsers.ParserMessageResponse, error) {
 	parser, err := parsers.NewParser(data.Service, data)
 	log.Printf("parser: %v", parser)
 	if err != nil {
-		return nil, errors.New("Error creating parser for service")
+		return parsers.ParserMessageResponse{}, errors.New("Error creating parser for service")
 	}
 
-	parsed, err := parser.ParseMessage(data.Message)
+	parseData, err := parser.ParseMessage(data.Message)
 	if err != nil {
-		return nil, errors.New("Error parsing data for service")
+		return parsers.ParserMessageResponse{}, errors.New("Error parsing data for service")
 	}
-	log.Printf("Parsed data: %v", parsed)
+	log.Printf("Parsed data: %v", parseData)
 
-	return parsed, nil
+	return parseData, nil
 }

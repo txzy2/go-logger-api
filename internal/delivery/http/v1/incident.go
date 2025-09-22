@@ -3,7 +3,6 @@ package v1
 import (
 	"log"
 	"net/http"
-	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
 	"github.com/txzy2/go-logger-api/pkg/types"
@@ -37,7 +36,6 @@ func (h *Handler) processIncidentBackground(data types.IncidentData) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Printf("Recovered from panic in background processing: %v", r)
-			debug.PrintStack()
 		}
 	}()
 

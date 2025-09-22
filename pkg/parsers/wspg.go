@@ -12,22 +12,19 @@ type WSPGParser struct {
 	Data types.IncidentData
 }
 
-func (p *WSPGParser) Parse(data string) (map[string]string, error) {
-	return map[string]string{
-		"service": "WSPG",
-		"level":   p.Data.Level,
+func (p *WSPGParser) Parse(data string) (ParserResponse, error) {
+	return ParserResponse{
+		Service: "WSPG",
+		Level:   data,
 	}, nil
 }
 
-func (p *WSPGParser) ParseMessage(message string) (map[string]string, error) {
+func (p *WSPGParser) ParseMessage(message string) (ParserMessageResponse, error) {
 	if strings.Contains(message, "|") {
 		parts := strings.Split(message, "|")
 		log.Println("parts: ", parts)
-		return map[string]string{"code": parts[0],
-			"message": parts[1],
-		}, nil
-
+		return ParserMessageResponse{Code: parts[0], Message: parts[1]}, nil
 	}
 
-	return map[string]string{}, errors.New("invalid message")
+	return ParserMessageResponse{}, errors.New("invalid message")
 }
