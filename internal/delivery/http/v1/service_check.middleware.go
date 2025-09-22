@@ -1,23 +1,25 @@
 package v1
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/txzy2/go-logger-api/internal/repository"
 	"github.com/txzy2/go-logger-api/pkg/basic"
 	"github.com/txzy2/go-logger-api/pkg/types"
+	"go.uber.org/zap"
 )
 
 type IncidentMiddleware struct {
 	repo *repository.Repository
 	basic.BaseController[any]
+	logger *zap.Logger
 }
 
-func NewIncidentMiddleware(repo *repository.Repository) *IncidentMiddleware {
+func NewIncidentMiddleware(repo *repository.Repository, logger *zap.Logger) *IncidentMiddleware {
 	return &IncidentMiddleware{
-		repo: repo,
+		repo:   repo,
+		logger: logger,
 	}
 }
 
@@ -35,7 +37,7 @@ func (m *IncidentMiddleware) ServiceCheckMiddleware() gin.HandlerFunc {
 
 		serviceName := incidentData.Service
 		if _, err := m.repo.IncidentRepository.FindByName(serviceName); err != nil {
-			log.Printf("Error while checking service: %s", err.Error())
+			m.logger.Error("Error while checking service", zap.Error(err))
 			m.Error(c, http.StatusBadRequest, err.Error())
 			c.Abort()
 			return

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/txzy2/go-logger-api/internal/repository"
+	"go.uber.org/zap"
 )
 
 type TestService interface {
@@ -11,11 +12,13 @@ type TestService interface {
 }
 
 type testService struct {
+	logger   *zap.Logger
 	testRepo repository.TestRepository
 }
 
-func NewTestService(testRepo repository.TestRepository) TestService {
+func NewTestService(logger *zap.Logger, testRepo repository.TestRepository) TestService {
 	return &testService{
+		logger:   logger,
 		testRepo: testRepo,
 	}
 }

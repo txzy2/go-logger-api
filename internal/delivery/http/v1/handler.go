@@ -5,6 +5,7 @@ import (
 	"github.com/txzy2/go-logger-api/internal/repository"
 	"github.com/txzy2/go-logger-api/internal/service"
 	"github.com/txzy2/go-logger-api/pkg/basic"
+	"go.uber.org/zap"
 )
 
 type Handler struct {
@@ -12,13 +13,15 @@ type Handler struct {
 	repos              *repository.Repository
 	incidentMiddleware *IncidentMiddleware
 	basic.BaseController[any]
+	logger *zap.Logger
 }
 
-func NewHandler(services *service.Service, repos *repository.Repository) *Handler {
+func NewHandler(services *service.Service, repos *repository.Repository, zapLogger *zap.Logger) *Handler {
 	return &Handler{
 		services:           services,
 		repos:              repos,
-		incidentMiddleware: NewIncidentMiddleware(repos),
+		incidentMiddleware: NewIncidentMiddleware(repos, zapLogger),
+		logger:             zapLogger,
 	}
 }
 

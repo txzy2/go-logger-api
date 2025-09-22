@@ -6,6 +6,7 @@ import (
 
 	"github.com/txzy2/go-logger-api/internal/models"
 	"github.com/txzy2/go-logger-api/pkg/types"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -14,12 +15,14 @@ type IncidentRepository interface {
 }
 
 type incidentRepository struct {
-	db *gorm.DB
+	logger *zap.Logger
+	db     *gorm.DB
 }
 
-func NewIncidentRepository(db *gorm.DB) IncidentRepository {
+func NewIncidentRepository(logger *zap.Logger, db *gorm.DB) IncidentRepository {
 	return &incidentRepository{
-		db: db,
+		logger: logger,
+		db:     db,
 	}
 }
 

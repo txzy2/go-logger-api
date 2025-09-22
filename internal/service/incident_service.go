@@ -3,11 +3,11 @@ package service
 import (
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/txzy2/go-logger-api/internal/repository"
 	"github.com/txzy2/go-logger-api/pkg/parsers"
 	"github.com/txzy2/go-logger-api/pkg/types"
+	"go.uber.org/zap"
 )
 
 type IncidentService interface {
@@ -15,15 +15,18 @@ type IncidentService interface {
 }
 
 type incidentService struct {
+	logger           *zap.Logger
 	incidentRepo     repository.IncidentRepository
 	incidentTypeRepo repository.IncidentTypeRepository
 }
 
 func NewIncidentService(
+	logger *zap.Logger,
 	incidentRepo repository.IncidentRepository,
 	incidentTypeRepo repository.IncidentTypeRepository,
 ) IncidentService {
 	return &incidentService{
+		logger:           logger,
 		incidentRepo:     incidentRepo,
 		incidentTypeRepo: incidentTypeRepo,
 	}
@@ -34,7 +37,10 @@ func (s *incidentService) WriteOrSaveLogs(data types.IncidentData) string {
 	if err == nil {
 		res, err := s.incidentTypeRepo.FindByCode(parseData.Code)
 		if err == nil {
-			log.Printf("Incident type: %v", res)
+			s.logger.Warn("Incident type retrieved",
+				zap.Any("incident_type", res),
+				zap.String("method", "GetIncidentType"),
+			)
 			return "SUCCESS"
 		}
 	}
@@ -44,7 +50,7 @@ func (s *incidentService) WriteOrSaveLogs(data types.IncidentData) string {
 
 func (s *incidentService) parseIncidentMessage(data types.IncidentData) (parsers.ParserMessageResponse, error) {
 	parser, err := parsers.NewParser(data.Service, data)
-	log.Printf("parser: %v", parser)
+	s.logger.Info("Parser created")
 	if err != nil {
 		return parsers.ParserMessageResponse{}, errors.New("Error creating parser for service")
 	}
@@ -53,7 +59,7 @@ func (s *incidentService) parseIncidentMessage(data types.IncidentData) (parsers
 	if err != nil {
 		return parsers.ParserMessageResponse{}, errors.New("Error parsing data for service")
 	}
-	log.Printf("Parsed data: %v", parseData)
+	s.logger.Info("Data parsed", zap.Any("data", parseData))
 
 	return parseData, nil
 }

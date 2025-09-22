@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -11,13 +12,15 @@ type TestRepository interface {
 }
 
 type testRepository struct {
-	db *gorm.DB
+	logger *zap.Logger
+	db     *gorm.DB
 }
 
 // NewTestRepository создает новый экземпляр тестового репозитория
-func NewTestRepository(db *gorm.DB) TestRepository {
+func NewTestRepository(logger *zap.Logger, db *gorm.DB) TestRepository {
 	return &testRepository{
-		db: db,
+		logger: logger,
+		db:     db,
 	}
 }
 

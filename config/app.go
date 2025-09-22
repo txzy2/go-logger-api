@@ -11,6 +11,7 @@ import (
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
 	v1 "github.com/txzy2/go-logger-api/internal/delivery/http/v1"
@@ -19,30 +20,52 @@ import (
 	"github.com/txzy2/go-logger-api/pkg/database"
 )
 
-type App struct{}
+type App struct {
+	logger *zap.Logger
+}
 
 func NewApp() *App {
-	return &App{}
+	logger := setupLogger()
+
+	logger.Info("Application initialized",
+		zap.String("version", "1.0.0"),
+		zap.String("environment", getEnv("APP_ENV", "development")),
+	)
+
+	return &App{logger: logger}
 }
 
 func (a *App) Run(port string) error {
+	defer func() {
+		if err := a.logger.Sync(); err != nil {
+			log.Printf("Warning: failed to sync logger: %v", err)
+		}
+	}()
+
+	// Устанавливаем режим Gin
+	if os.Getenv("APP_ENV") == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	router := gin.New()
-	router.Use(gin.Logger(), gin.Recovery())
+
+	router.Use(gin.Recovery())
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// Инициализация подключения к БД
 	dbConfig := database.NewConfigFromEnv()
 	db, err := database.NewDatabase(dbConfig)
 	if err != nil {
+		a.logger.Error("Database connection failed", zap.Error(err))
 		return err
 	}
+	a.logger.Info("Database connected successfully")
 
-	repos := repository.NewRepository(db)
-	services := service.NewService(repos)
+	repos := repository.NewRepository(a.logger, db)
+	services := service.NewService(repos, a.logger)
 
 	// Инициализация handlers
-	handler := v1.NewHandler(services, repos)
+	handler := v1.NewHandler(services, repos, a.logger)
 	handler.InitRoutes(router)
 
 	srv := &http.Server{
@@ -51,8 +74,9 @@ func (a *App) Run(port string) error {
 	}
 
 	go func() {
+		a.logger.Info("Starting server", zap.String("port", port))
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %v", err)
+			a.logger.Fatal("Server listen error", zap.Error(err))
 		}
 	}()
 
@@ -60,11 +84,15 @@ func (a *App) Run(port string) error {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
+	a.logger.Info("Shutting down server...")
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+		a.logger.Error("Server shutdown error", zap.Error(err))
+		return err
 	}
 
+	a.logger.Info("Server exited properly")
 	return nil
 }
