@@ -21,7 +21,7 @@ type IncidentData struct {
 	Domain           string            `json:"domain" validate:"required" example:"database" description:"Домен системы, где произошло событие"`
 	Action           string            `json:"action" validate:"required" example:"connect" description:"Действие, которое выполнялось при возникновении события"`
 	Function         string            `json:"function" validate:"required" example:"ConnectDB" description:"Название функции, где произошло событие"`
-	Service          string            `json:"service" validate:"required" example:"user-service" description:"Название сервиса"`
+	Service          Service           `json:"service" validate:"required" example:"user-service" description:"Название сервиса"`
 	AdditionalFields []AdditionalField `json:"additionalFields" validate:"required" description:"Дополнительные поля с метаданными"`
 	Date             string            `json:"date" validate:"required" example:"2024-01-15T10:30:00Z" description:"Дата и время события в ISO 8601 формате"`
 }

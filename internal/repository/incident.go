@@ -5,11 +5,12 @@ import (
 	"fmt"
 
 	"github.com/txzy2/go-logger-api/internal/models"
+	"github.com/txzy2/go-logger-api/pkg/types"
 	"gorm.io/gorm"
 )
 
 type IncidentRepository interface {
-	FindByName(serviceName string) (bool, error)
+	FindByName(serviceName types.Service) (bool, error)
 }
 
 type incidentRepository struct {
@@ -22,7 +23,7 @@ func NewIncidentRepository(db *gorm.DB) IncidentRepository {
 	}
 }
 
-func (r *incidentRepository) FindByName(serviceName string) (bool, error) {
+func (r *incidentRepository) FindByName(serviceName types.Service) (bool, error) {
 	err := r.db.Model(&models.Services{}).Where("name = ? AND active = ?", serviceName, models.ActiveStatus).First(&models.Services{}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

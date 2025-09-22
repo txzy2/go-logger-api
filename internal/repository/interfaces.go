@@ -5,13 +5,15 @@ import (
 )
 
 type Repository struct {
-	TestRepository     TestRepository
-	IncidentRepository IncidentRepository
+	TestRepository         TestRepository
+	IncidentRepository     IncidentRepository
+	IncidentTypeRepository IncidentTypeRepository
 }
 
 func NewRepository(db *database.Database) *Repository {
 	return &Repository{
-		TestRepository:     NewTestRepository(db.GORM),
-		IncidentRepository: NewIncidentRepository(db.GORM),
+		TestRepository:         NewTestRepository(db.GORM),
+		IncidentRepository:     NewIncidentRepository(db.GORM),
+		IncidentTypeRepository: NewIncidentTypeRepository(db.GORM),
 	}
 }

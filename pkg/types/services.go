@@ -1,4 +1,4 @@
-package parsers
+package types
 
 type Service string
 

@@ -12,7 +12,7 @@ type ParserInterface interface {
 
 type Parser struct{}
 
-func NewParser(service Service, data types.IncidentData) (ParserInterface, error) {
+func NewParser(service types.Service, data types.IncidentData) (ParserInterface, error) {
 	creator, exists := parserFactory[service]
 	if !exists {
 		return nil, errors.ErrUnknownService
@@ -20,8 +20,8 @@ func NewParser(service Service, data types.IncidentData) (ParserInterface, error
 	return creator(data), nil
 }
 
-var parserFactory = map[Service]func(types.IncidentData) ParserInterface{
-	WSPG: func(data types.IncidentData) ParserInterface {
+var parserFactory = map[types.Service]func(types.IncidentData) ParserInterface{
+	types.WSPG: func(data types.IncidentData) ParserInterface {
 		return &WSPGParser{Data: data}
 	},
 	// ADS: func(data types.IncidentData) ParserInterface {
