@@ -22,5 +22,6 @@ func (h *Handler) Health(c *gin.Context) {
 		return
 	}
 
+	h.logger.Info("Database is connected. API is healthy.")
 	h.BaseController.OK(c, "DATABASE IS CONNECTED", nil)
 }
