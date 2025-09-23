@@ -1,6 +1,8 @@
 package types
 
 import (
+	"time"
+
 	"github.com/go-playground/validator/v10"
 )
 
@@ -22,8 +24,10 @@ type IncidentData struct {
 	Action           string            `json:"action" validate:"required" example:"connect" description:"Действие, которое выполнялось при возникновении события"`
 	Function         string            `json:"function" validate:"required" example:"ConnectDB" description:"Название функции, где произошло событие"`
 	Service          Service           `json:"service" validate:"required" example:"user-service" description:"Название сервиса"`
+	File             string            `json:"file" validate:"required" example:"main.go" description:"Файл, где произошло событие"`
+	Class            string            `json:"class" validate:"required" example:"User" description:"Класс, где произошло событие"`
 	AdditionalFields []AdditionalField `json:"additionalFields" validate:"required" description:"Дополнительные поля с метаданными"`
-	Date             string            `json:"date" validate:"required" example:"2024-01-15T10:30:00Z" description:"Дата и время события в ISO 8601 формате"`
+	Date             time.Time         `json:"date" validate:"required" example:"2024-01-15T10:30:00Z" description:"Дата и время события в ISO 8601 формате"`
 }
 
 func ValidateIncidentData(data IncidentData) error {

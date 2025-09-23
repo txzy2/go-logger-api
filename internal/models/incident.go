@@ -18,7 +18,6 @@ type Incident struct {
 	Class            string    `gorm:"type:varchar(255);not null" json:"class"`
 	File             string    `gorm:"type:varchar(255);not null" json:"file"`
 	Date             time.Time `gorm:"type:date;not null" json:"date"`
-	Count            int       `gorm:"not null" json:"count"`
 	CreatedAt        time.Time `json:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at"`
 
