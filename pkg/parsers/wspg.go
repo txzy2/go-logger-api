@@ -2,7 +2,6 @@ package parsers
 
 import (
 	"errors"
-	"log"
 	"strings"
 
 	"github.com/txzy2/go-logger-api/pkg/types"
@@ -22,7 +21,6 @@ func (p *WSPGParser) Parse(data string) (ParserResponse, error) {
 func (p *WSPGParser) ParseMessage(message string) (ParserMessageResponse, error) {
 	if strings.Contains(message, "|") {
 		parts := strings.Split(message, "|")
-		log.Println("parts: ", parts)
 		return ParserMessageResponse{Code: parts[0], Message: parts[1]}, nil
 	}
 

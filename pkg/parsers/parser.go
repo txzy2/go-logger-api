@@ -1,6 +1,8 @@
 package parsers
 
 import (
+	"time"
+
 	errors "github.com/txzy2/go-logger-api/pkg"
 	"github.com/txzy2/go-logger-api/pkg/types"
 )
@@ -27,4 +29,8 @@ var parserFactory = map[types.Service]func(types.IncidentData) ParserInterface{
 	// ADS: func(data types.IncidentData) ParserInterface {
 	// 	return &ADSParser{Data: data}
 	// },
+}
+
+func FormatDate(date time.Time) string {
+	return date.Format("2006-01-02")
 }
