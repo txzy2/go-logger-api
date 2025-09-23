@@ -1,13 +1,16 @@
 package repository
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/txzy2/go-logger-api/internal/models"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 type IncidentTypeRepository interface {
-	FindByCode(code string) (bool, error)
+	FindByCode(code string) (*models.IncidentType, error)
 }
 
 type incidentTypeRepository struct {
@@ -22,11 +25,19 @@ func NewIncidentTypeRepository(logger *zap.Logger, db *gorm.DB) IncidentTypeRepo
 	}
 }
 
-func (r *incidentTypeRepository) FindByCode(code string) (bool, error) {
-	err := r.db.Model(&models.IncidentType{}).Where("code = ?", code).First(&models.IncidentType{}).Error
+func (r *incidentTypeRepository) FindByCode(code string) (*models.IncidentType, error) {
+	var incidentType models.IncidentType
+	err := r.db.Where("code = ?", code).First(&incidentType).Error
+
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			r.logger.Warn("Incident type not found", zap.String("code", code))
+			return nil, fmt.Errorf("incident type with code '%s' not found", code)
+		}
+
 		r.logger.Error("Error finding incident type", zap.Error(err))
-		return false, err
+		return nil, err
 	}
-	return true, nil
+
+	return &incidentType, nil
 }

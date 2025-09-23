@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/txzy2/go-logger-api/pkg/types"
+	"go.uber.org/zap"
 )
 
 // Create создает новый инцидент в системе логирования
@@ -27,6 +28,7 @@ func (h *Handler) Create(c *gin.Context) {
 		return
 	}
 
+	h.logger.Info("Incident REQUEST", zap.Any("data", data))
 	h.BaseController.OK(c, "SUCCESS", nil)
 
 	go h.processIncidentBackground(data)
@@ -39,6 +41,5 @@ func (h *Handler) processIncidentBackground(data types.IncidentData) {
 		}
 	}()
 
-	res := h.services.IncidentService.WriteOrSaveLogs(data)
-	log.Printf("Result of parsing: %s", res)
+	h.services.IncidentService.WriteOrSaveLogs(data)
 }
