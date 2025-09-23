@@ -1,9 +1,9 @@
 package repository
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -41,13 +41,19 @@ func (r *incidentRepository) FindByName(serviceName types.Service) (bool, error)
 }
 
 func (r *incidentRepository) CreateIncident(data types.IncidentData, incidentTypeId uint) {
+	additionalFields, err := json.Marshal(data.AdditionalFields)
+	if err != nil {
+		r.logger.Error("marshal additionalFields", zap.Error(err))
+		additionalFields = []byte("[]")
+	}
+
 	user := &models.Incident{
 		Service:          string(data.Service),
 		Level:            data.Level,
 		Message:          data.Message,
 		IncidentTypeID:   incidentTypeId,
 		Action:           data.Action,
-		AdditionalFields: r.formatAdditionalFields(&data.AdditionalFields),
+		AdditionalFields: additionalFields,
 		Function:         data.Function,
 		Class:            data.Class,
 		File:             data.File,
@@ -56,19 +62,10 @@ func (r *incidentRepository) CreateIncident(data types.IncidentData, incidentTyp
 		UpdatedAt:        time.Now(),
 	}
 
-	err := r.db.Create(&user).Error
+	err = r.db.Create(&user).Error
 	if err != nil {
 		r.logger.Error("Error creating incident", zap.Error(err))
 	}
 
 	r.logger.Info("Incident created", zap.Any("incident", user))
-}
-
-func (r *incidentRepository) formatAdditionalFields(additionalFields *[]types.AdditionalField) string {
-	var formattedFields []string
-	for _, field := range *additionalFields {
-		formattedFields = append(formattedFields, fmt.Sprintf("%s: %s", field.Key, field.Value))
-	}
-
-	return strings.Join(formattedFields, ", ")
 }
