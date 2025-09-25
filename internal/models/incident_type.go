@@ -12,13 +12,12 @@ type IncidentType struct {
 	SendTemplateID uint      `gorm:"not null" json:"send_template_id"`
 	Code           string    `gorm:"type:varchar(50);not null" json:"code"`
 	Lifecycle      *string   `gorm:"type:varchar(255)" json:"lifecycle,omitempty"`
-	Alias          string    `gorm:"type:varchar(255);default:'manager';not null;check:alias IN ('manager','client')" json:"alias"`
+	Alias          string    `gorm:"type:varchar(255);default:'NULL';check:alias IN ('email','push')" json:"alias"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 
 	// Связи
 	SendTemplate SendTemplate `gorm:"foreignKey:SendTemplateID;references:ID" json:"send_template,omitempty"`
-	Incidents    []Incident   `gorm:"foreignKey:IncidentTypeID;references:ID" json:"incidents,omitempty"`
 }
 
 // TableName возвращает имя таблицы для модели IncidentType

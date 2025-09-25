@@ -41,5 +41,5 @@ func (h *Handler) processIncidentBackground(data types.IncidentData) {
 		}
 	}()
 
-	h.services.IncidentService.WriteOrSaveLogs(data)
+	h.services.IncidentService.ProcessIncident(data)
 }

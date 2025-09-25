@@ -1,8 +1,6 @@
 package service
 
 import (
-	"errors"
-
 	"github.com/txzy2/go-logger-api/internal/repository"
 	"github.com/txzy2/go-logger-api/pkg/parsers"
 	"github.com/txzy2/go-logger-api/pkg/types"
@@ -10,7 +8,7 @@ import (
 )
 
 type IncidentService interface {
-	WriteOrSaveLogs(data types.IncidentData)
+	ProcessIncident(data types.IncidentData)
 }
 
 type incidentService struct {
@@ -31,32 +29,29 @@ func NewIncidentService(
 	}
 }
 
-func (s *incidentService) WriteOrSaveLogs(data types.IncidentData) {
-	parseData, err := s.parseIncidentMessage(data)
-	if err != nil {
-		s.logger.Warn("Incident type retrieved", zap.Error(err), zap.Any("data", data), zap.String("method", "parseIncidentMessage"))
+func (s *incidentService) ProcessIncident(data types.IncidentData) {
+	s.logger.Info("Incident data", zap.Any("data", data), zap.String("method", "CreateIncident"))
+	// Пытаемся записать инцидент
+	res := s.incidentRepo.CreateIncident(data)
+	if !res {
 		return
 	}
 
-	res, err := s.incidentTypeRepo.FindByCode(parseData.Code)
-	if err != nil {
-		s.logger.Warn("Incident type retrieved", zap.Error(err), zap.Any("Code", parseData.Code), zap.String("method", "FindByCode"))
+	// Ищем поле code в AdditionalField чтобы потом попробовать отпаравить
+	code, ok := parsers.FindKeyInAdditionalFields(data.AdditionalFields, "code")
+	if !ok {
+		s.logger.Warn("Incident AdditionalField find key error", zap.Any("data", data), zap.String("method", "hasKey"))
 		return
 	}
 
-	s.incidentRepo.CreateIncident(data, res.ID)
-}
-
-func (s *incidentService) parseIncidentMessage(data types.IncidentData) (parsers.ParserMessageResponse, error) {
-	parser, err := parsers.NewParser(data.Service, data)
+	// Проверяем отслеживаем ли такой тип ошибки
+	incidentType, err := s.incidentTypeRepo.FindByCode(code)
 	if err != nil {
-		return parsers.ParserMessageResponse{}, errors.New("Error creating parser for service")
+		s.logger.Warn("Incident Code is not found", zap.Error(err), zap.Any("Code", code), zap.String("method", "FindByCode"))
+		return
 	}
+	s.logger.Info("Incident type retrieved", zap.Any("data", incidentType), zap.String("method", "FindByCode"))
 
-	parseData, err := parser.ParseMessage(data.Message)
-	if err != nil {
-		return parsers.ParserMessageResponse{}, errors.New("Error parsing data for service")
-	}
+	// TODO: Сделать отправку (фильтровать по email или push)
 
-	return parseData, nil
 }

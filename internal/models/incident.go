@@ -13,7 +13,6 @@ type Incident struct {
 	Service          string         `gorm:"type:varchar(255);not null" json:"service"`
 	Level            string         `gorm:"type:varchar(255);not null" json:"level"`
 	Message          string         `gorm:"type:varchar(255);not null" json:"message"`
-	IncidentTypeID   uint           `gorm:"not null" json:"incident_type_id"`
 	Action           string         `gorm:"type:varchar(255);not null" json:"action"`
 	AdditionalFields datatypes.JSON `gorm:"type:json;not null" json:"additionalFields"`
 	Function         string         `gorm:"type:varchar(255);not null" json:"function"`
@@ -22,9 +21,6 @@ type Incident struct {
 	Date             time.Time      `gorm:"type:date;not null" json:"date"`
 	CreatedAt        time.Time      `json:"created_at"`
 	UpdatedAt        time.Time      `json:"updated_at"`
-
-	// Связи
-	IncidentType IncidentType `gorm:"foreignKey:IncidentTypeID;references:ID" json:"incident_type,omitempty"`
 }
 
 // TableName возвращает имя таблицы для модели Incident

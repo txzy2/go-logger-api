@@ -15,7 +15,7 @@ import (
 
 type IncidentRepository interface {
 	FindByName(serviceName types.Service) (bool, error)
-	CreateIncident(data types.IncidentData, incidentTypeID uint)
+	CreateIncident(data types.IncidentData) bool
 }
 
 type incidentRepository struct {
@@ -40,7 +40,7 @@ func (r *incidentRepository) FindByName(serviceName types.Service) (bool, error)
 	return err == nil, err
 }
 
-func (r *incidentRepository) CreateIncident(data types.IncidentData, incidentTypeID uint) {
+func (r *incidentRepository) CreateIncident(data types.IncidentData) bool {
 	additionalFields, err := json.Marshal(data.AdditionalFields)
 	if err != nil {
 		r.logger.Error("marshal additionalFields", zap.Error(err))
@@ -51,7 +51,6 @@ func (r *incidentRepository) CreateIncident(data types.IncidentData, incidentTyp
 		Service:          string(data.Service),
 		Level:            data.Level,
 		Message:          data.Message,
-		IncidentTypeID:   incidentTypeID,
 		Action:           data.Action,
 		AdditionalFields: additionalFields,
 		Function:         data.Function,
@@ -66,9 +65,13 @@ func (r *incidentRepository) CreateIncident(data types.IncidentData, incidentTyp
 	if err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			r.logger.Error("Error creating incident", zap.Error(err))
+		} else {
+			r.logger.Error("Error creating incident", zap.Error(err))
 		}
-		r.logger.Error("Error creating incident", zap.Error(err))
+
+		return false
 	}
 
 	r.logger.Info("Incident created", zap.Any("incident", user))
+	return true
 }
