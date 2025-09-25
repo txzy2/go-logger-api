@@ -8,6 +8,8 @@ import (
 	"github.com/txzy2/go-logger-api/pkg"
 )
 
+// TODO: Сделать автоудаление через lifecircle
+
 // @title Logger Go API
 // @version 1.0
 // @description API для системы логирования инцидентов с поддержкой PostgreSQL

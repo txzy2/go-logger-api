@@ -1,0 +1,32 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+ 
+
+<div style="width:100%;display:flex;justify-content:center;font-family: 'Roboto', sans-serif;">
+  <div style="display:flex;width:100%;max-width:600px;flex-direction:column;align-items:center;border-radius:12px;background:linear-gradient(145deg,#ffffff,#e6e9ef);padding:32px;box-shadow:0 4px 10px rgba(0,0,0,0.15);font-family:Roboto,Arial,sans-serif;color:#334155;">
+    <h1 style="margin-bottom:4px;font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#ff6f00;">Уведомление о событии</h1>
+    <h2 style="margin:0 0 8px 0;font-size:22px;font-weight:500;color:#0f172a;text-align:center;">{{.Title}}</h2>
+
+    <div style="margin:4px 0;height:1px;width:80%;background-color:#cbd5e1;"></div>
+
+    {{if .Items}}
+      <div style="width:100%;">
+        {{range .Items}}
+          <p style="margin:0;font-size:16px;font-style:italic;color:#475569;">
+            <span style="font-weight:700;color:#78350f;">{{.Key}}:</span> {{.Value}}
+          </p>
+        {{end}}
+      </div>
+    {{else}}
+      <p style="margin:0;font-size:16px;font-style:italic;color:#475569;">Нет данных для отображения</p>
+    {{end}}
+
+    <div style="margin:4px 0;height:1px;width:80%;background-color:#cbd5e1;"></div>
+
+    <div style="margin-top:20px;text-align:center;font-size:14px;color:#64748b;">
+      <p style="margin:0;">Сервис рассылки <span style="font-weight:700;color:#ff6f00;">1С-Рарус</span></p>
+    </div>
+  </div>
+
+</div>

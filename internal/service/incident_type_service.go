@@ -5,7 +5,9 @@ import (
 	"go.uber.org/zap"
 )
 
-type IncidentTypeService interface{}
+type IncidentTypeService interface {
+	// Add()
+}
 
 type incidentTypeService struct {
 	logger           *zap.Logger
