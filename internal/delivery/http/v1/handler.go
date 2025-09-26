@@ -12,6 +12,7 @@ type Handler struct {
 	services           *service.Service
 	repos              *repository.Repository
 	incidentMiddleware *IncidentMiddleware
+	headerMiddleware   *HeaderMiddleware
 	basic.BaseController[any]
 	logger *zap.Logger
 }
@@ -21,6 +22,7 @@ func NewHandler(services *service.Service, repos *repository.Repository, zapLogg
 		services:           services,
 		repos:              repos,
 		incidentMiddleware: NewIncidentMiddleware(repos, zapLogger),
+		headerMiddleware:   NewHeaderMiddleware(zapLogger),
 		logger:             zapLogger,
 	}
 }
@@ -35,22 +37,22 @@ func NewHandler(services *service.Service, repos *repository.Repository, zapLogg
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
 func (h *Handler) InitRoutes(router *gin.Engine) {
-	api := router.Group("/api/v1")
+	api := router.Group("/api/v1", h.headerMiddleware.HeaderMiddleware())
 	{
-		test := api.Group("/test")
+		log := api.Group("/log", h.incidentMiddleware.ServiceCheckMiddleware())
 		{
-			test.GET("/health", h.Health)
-			test.POST("/template", h.GetTemplate)
-		}
-
-		log := api.Group("/log")
-		{
-			log.POST("/", h.incidentMiddleware.ServiceCheckMiddleware(), h.Create)
+			log.POST("/", h.Create)
 		}
 
 		types := api.Group("/types")
 		{
 			types.POST("/add", h.AddType)
 		}
+	}
+
+	test := router.Group("/test")
+	{
+		test.GET("/health", h.Health)
+		test.POST("/template", h.GetTemplate)
 	}
 }

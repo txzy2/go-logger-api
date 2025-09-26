@@ -30,7 +30,6 @@ func NewIncidentService(
 }
 
 func (s *incidentService) ProcessIncident(data types.IncidentData) {
-	s.logger.Info("Incident data", zap.Any("data", data), zap.String("method", "CreateIncident"))
 	// Пытаемся записать инцидент
 	res := s.incidentRepo.CreateIncident(data)
 	if !res {

@@ -3,12 +3,13 @@ package database
 import (
 	"fmt"
 	"log"
-	"os"
 
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/txzy2/go-logger-api/pkg"
 )
 
 type Config struct {
@@ -30,7 +31,7 @@ func NewDatabase(cfg *Config) (*Database, error) {
 
 	// Создаем GORM подключение
 	gormDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: logger.Default.LogMode(logger.Error),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to open gorm database: %w", err)
@@ -43,12 +44,12 @@ func NewDatabase(cfg *Config) (*Database, error) {
 
 func NewConfigFromEnv() *Config {
 	return &Config{
-		Host:     getEnv("DB_HOST", "localhost"),
-		Port:     getEnv("DB_PORT", "5432"),
-		User:     getEnv("DB_USER", "postgres"),
-		Password: getEnv("DB_PASS", "password"),
-		DBName:   getEnv("DB_NAME", "logger_db"),
-		SSLMode:  getEnv("DB_SSLMODE", "disable"),
+		Host:     pkg.GetEnv("DB_HOST", "localhost"),
+		Port:     pkg.GetEnv("DB_PORT", "5432"),
+		User:     pkg.GetEnv("DB_USER", "postgres"),
+		Password: pkg.GetEnv("DB_PASS", "password"),
+		DBName:   pkg.GetEnv("DB_NAME", "logger_db"),
+		SSLMode:  pkg.GetEnv("DB_SSLMODE", "disable"),
 	}
 }
 
@@ -60,11 +61,4 @@ func (d *Database) Close() error {
 		}
 	}
 	return err
-}
-
-func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
 }

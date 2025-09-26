@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"log"
+	"os"
 
 	"github.com/joho/godotenv"
 )
@@ -14,4 +15,11 @@ func LoadEnv() error {
 	}
 
 	return nil
+}
+
+func GetEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
 }
