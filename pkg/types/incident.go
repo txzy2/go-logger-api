@@ -17,13 +17,14 @@ var validate = validator.New()
 
 // IncidentData представляет данные инцидента для создания
 // @Description Структура данных для создания нового инцидента в системе
+// TODO: Убрать привязку к сервисам
 type IncidentData struct {
 	Level            string            `json:"level" validate:"required" example:"ERROR" description:"Уровень логирования (error, warning, info)"`
 	Message          string            `json:"message" validate:"required" example:"Database connection failed" description:"Сообщение об ошибке или событии"`
 	Domain           string            `json:"domain" validate:"required" example:"database" description:"Домен системы, где произошло событие"`
 	Action           string            `json:"action" validate:"required" example:"connect" description:"Действие, которое выполнялось при возникновении события"`
 	Function         string            `json:"function" validate:"required" example:"ConnectDB" description:"Название функции, где произошло событие"`
-	Service          Service           `json:"service" validate:"required" example:"user-service" description:"Название сервиса"`
+	Service          string            `json:"service" validate:"required" example:"user-service" description:"Название сервиса"`
 	File             string            `json:"file" validate:"required" example:"main.go" description:"Файл, где произошло событие"`
 	Class            string            `json:"class" validate:"required" example:"User" description:"Класс, где произошло событие"`
 	AdditionalFields []AdditionalField `json:"additionalFields" validate:"required" description:"Дополнительные поля с метаданными"`

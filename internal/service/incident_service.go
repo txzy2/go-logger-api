@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/txzy2/go-logger-api/internal/models"
 	"github.com/txzy2/go-logger-api/internal/repository"
 	"github.com/txzy2/go-logger-api/pkg/parsers"
 	"github.com/txzy2/go-logger-api/pkg/types"
@@ -51,6 +52,15 @@ func (s *incidentService) ProcessIncident(data types.IncidentData) {
 	}
 	s.logger.Info("Incident type retrieved", zap.Any("data", incidentType), zap.String("method", "FindByCode"))
 
-	// TODO: Сделать отправку (фильтровать по email или push)
+	s.validateSenderMethod(incidentType)
+}
+
+func (s *incidentService) validateSenderMethod(incidentType *models.IncidentType) {
+	if incidentType.Alias == "" {
+		s.logger.Warn("Incident type is not supported", zap.Any("data", incidentType), zap.String("method", "FindByCode"))
+		return
+	}
+
+	//TODO: Сделать получение sendTemplate по id из таблицы по send_template_id
 
 }

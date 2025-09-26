@@ -28,7 +28,7 @@ func (h *Handler) Create(c *gin.Context) {
 		return
 	}
 
-	h.logger.Info("Incident REQUEST", zap.Any("data", data))
+	h.logger.Info("Incident create REQUEST", zap.Any("data", data))
 	h.BaseController.OK(c, "SUCCESS", nil)
 
 	go h.processIncidentBackground(data)

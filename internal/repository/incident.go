@@ -14,7 +14,7 @@ import (
 )
 
 type IncidentRepository interface {
-	FindByName(serviceName types.Service) (bool, error)
+	FindByName(serviceName string) (bool, error)
 	CreateIncident(data types.IncidentData) bool
 }
 
@@ -30,7 +30,8 @@ func NewIncidentRepository(logger *zap.Logger, db *gorm.DB) IncidentRepository {
 	}
 }
 
-func (r *incidentRepository) FindByName(serviceName types.Service) (bool, error) {
+// TODO: Убрать привязку к сервису, так мы привязываемя к опр. сервисам, надо просто проверять в БД
+func (r *incidentRepository) FindByName(serviceName string) (bool, error) {
 	err := r.db.Model(&models.Services{}).Where("name = ? AND active = ?", serviceName, models.ActiveStatus).First(&models.Services{}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

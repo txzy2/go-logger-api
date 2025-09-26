@@ -42,6 +42,7 @@ func (h *Handler) InitRoutes(router *gin.Engine) {
 		log := api.Group("/log", h.incidentMiddleware.ServiceCheckMiddleware())
 		{
 			log.POST("/", h.Create)
+			//TODO: Добавить получение сводки за по определенным данным
 		}
 
 		types := api.Group("/types")
