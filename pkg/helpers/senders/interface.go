@@ -8,29 +8,39 @@ import (
 )
 
 type SenderManagerInterface interface {
-	PrepareIncidentData() *PreparationResult
+	PrepareIncidentData() (*PreparationResult, error)
+	Send(sendData []EmailMessage) bool
 }
 
 type SenderManager struct {
 	MailManager MailSender
 }
 
-func NewSenderManager(channel Channel, data types.IncidentData, sendTemplate *models.SendTemplate, logger *zap.Logger) (SenderManagerInterface, error) {
+func NewSenderManager(sendMethod string, incidentType *models.IncidentType, incidentData *types.IncidentData, logger *zap.Logger) (SenderManagerInterface, error) {
+	channel := Channel(sendMethod)
+	if sendMethod == "" || !ValidChannels[channel] {
+		return nil, errors.ErrInvalidChannel
+	}
+
 	creator, exists := senderFactory[channel]
 	if !exists {
 		logger.Error(errors.ErrInvalidChannel.Error())
 		return nil, errors.ErrInvalidChannel
 	}
-	return creator(data, sendTemplate, logger), nil
+	return creator(incidentType, incidentData, logger), nil
 }
 
 var senderFactory = map[Channel]func(
-	types.IncidentData,
-	*models.SendTemplate,
+	*models.IncidentType,
+	*types.IncidentData,
 	*zap.Logger,
 ) SenderManagerInterface{
-	MAIL: func(data types.IncidentData, sendTemplate *models.SendTemplate, logger *zap.Logger) SenderManagerInterface {
+	EMAIL: func(incidentType *models.IncidentType, incidentData *types.IncidentData, logger *zap.Logger) SenderManagerInterface {
 		logger.Info("Mail sender created")
-		return &MailSender{Data: data, SendTemplate: sendTemplate, logger: logger}
+		data := DataToSendMail{
+			Message:         incidentData.Message,
+			AdditionalField: incidentData.AdditionalFields,
+		}
+		return &MailSender{IncidentType: incidentType, Data: data, logger: logger}
 	},
 }

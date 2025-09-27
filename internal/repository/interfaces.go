@@ -10,6 +10,7 @@ type Repository struct {
 	TestRepository         TestRepository
 	IncidentRepository     IncidentRepository
 	IncidentTypeRepository IncidentTypeRepository
+	TemplateRepository     TemplateRepository
 }
 
 func NewRepository(logger *zap.Logger, db *database.Database) *Repository {
@@ -18,5 +19,6 @@ func NewRepository(logger *zap.Logger, db *database.Database) *Repository {
 		TestRepository:         NewTestRepository(logger, db.GORM),
 		IncidentRepository:     NewIncidentRepository(logger, db.GORM),
 		IncidentTypeRepository: NewIncidentTypeRepository(logger, db.GORM),
+		TemplateRepository:     NewTemplateRepository(logger, db.GORM),
 	}
 }

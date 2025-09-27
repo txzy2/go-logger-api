@@ -27,7 +27,7 @@ func NewIncidentTypeRepository(logger *zap.Logger, db *gorm.DB) IncidentTypeRepo
 
 func (r *incidentTypeRepository) FindByCode(code string) (*models.IncidentType, error) {
 	var incidentType models.IncidentType
-	err := r.db.Where("code = ?", code).First(&incidentType).Error
+	err := r.db.Preload("SendTemplate").Where("code = ?", code).First(&incidentType).Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

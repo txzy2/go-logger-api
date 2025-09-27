@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/txzy2/go-logger-api/internal/models"
 	"github.com/txzy2/go-logger-api/internal/repository"
+	"github.com/txzy2/go-logger-api/pkg/helpers/senders"
 	"github.com/txzy2/go-logger-api/pkg/parsers"
 	"github.com/txzy2/go-logger-api/pkg/types"
 	"go.uber.org/zap"
@@ -16,17 +17,20 @@ type incidentService struct {
 	logger           *zap.Logger
 	incidentRepo     repository.IncidentRepository
 	incidentTypeRepo repository.IncidentTypeRepository
+	templateRepo     repository.TemplateRepository
 }
 
 func NewIncidentService(
 	logger *zap.Logger,
 	incidentRepo repository.IncidentRepository,
 	incidentTypeRepo repository.IncidentTypeRepository,
+	templateRepo repository.TemplateRepository,
 ) IncidentService {
 	return &incidentService{
 		logger:           logger,
 		incidentRepo:     incidentRepo,
 		incidentTypeRepo: incidentTypeRepo,
+		templateRepo:     templateRepo,
 	}
 }
 
@@ -50,17 +54,31 @@ func (s *incidentService) ProcessIncident(data types.IncidentData) {
 		s.logger.Warn("Incident Code is not found", zap.Error(err), zap.Any("Code", code), zap.String("method", "FindByCode"))
 		return
 	}
-	s.logger.Info("Incident type retrieved", zap.Any("data", incidentType), zap.String("method", "FindByCode"))
 
-	s.validateSenderMethod(incidentType)
+	s.validateAndSendToRecipient(incidentType, &data)
 }
 
-func (s *incidentService) validateSenderMethod(incidentType *models.IncidentType) {
+func (s *incidentService) validateAndSendToRecipient(incidentType *models.IncidentType, incidentData *types.IncidentData) {
 	if incidentType.Alias == "" {
 		s.logger.Warn("Incident type is not supported", zap.Any("data", incidentType), zap.String("method", "FindByCode"))
 		return
 	}
 
-	//TODO: Сделать получение sendTemplate по id из таблицы по send_template_id
+	// Создвем нового отправителя
+	sender, err := senders.NewSenderManager(incidentType.Alias, incidentType, incidentData, s.logger)
+	if err != nil {
+		s.logger.Error("Error creating sender", zap.Error(err))
+		return
+	}
 
+	res, err := sender.PrepareIncidentData()
+	if err != nil {
+		s.logger.Error("Error preparing incident data for send", zap.Error(err))
+		return
+	}
+
+	req := sender.Send(res.Emails)
+	s.logger.Info("Incident sent", zap.Bool("data", req), zap.String("method", "validateAndSendToRecipient"))
+
+	//TODO: Сделать запись в новую таблицу SendStatus
 }
